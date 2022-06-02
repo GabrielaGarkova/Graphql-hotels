@@ -1,0 +1,310 @@
+# Query: game
+# ContextLines: 1
+
+187 results - 14 files
+
+build\schema.gql:
+   5  
+   6: input BaseHotelInput {
+   7    description: String!
+
+  21    firstName: String
+  22:   hotelss: [HotelInput!]!
+  23    lastName: String
+
+  26  
+  27: type Hotel {
+  28    _id: ObjectId!
+
+  33  
+  34: input HotelInput {
+  35    _id: ObjectId!
+
+  41  type Mutation {
+  42:   createHotel(data: BaseHotelInput!): Hotel!
+  43    createUser(data: CreateUserInput!): User!
+  44:   deleteHotel(_id: String!): Hotel!
+  45    deleteUser(_id: String!): User!
+  46:   editHotel(_id: String!, data: HotelInput!): Hotel!
+  47    editUser(_id: String!, data: EditUserInput!): User!
+
+  55    currentUser: User!
+  56:   hotel(_id: String!): Hotel!
+  57:   hotelss: [Hotel!]!
+  58    user(_id: String!): User!
+
+  65    firstName: String!
+  66:   hotels: [Hotel!]!
+  67    lastLogin: Float!
+
+build\schema.js:
+  29  const auth_resolver_1 = require("./resolvers/auth/auth-resolver");
+  30: const game_resolver_1 = require("./resolvers/game/game-resolver");
+  31  const typegoose_middleware_1 = require("./typegoose-middleware");
+
+  40              auth_resolver_1.AuthResolver,
+  41:             game_resolver_1.GameResolver,
+  42          ],
+
+build\entities\game-entity.js:
+  11  Object.defineProperty(exports, "__esModule", { value: true });
+  12: exports.GameModel = exports.Game = void 0;
+  13  const type_graphql_1 = require("type-graphql");
+
+  15  const mongodb_1 = require("mongodb");
+  16: let Game = class Game {
+  17  };
+
+  20      __metadata("design:type", mongodb_1.ObjectId)
+  21: ], Game.prototype, "_id", void 0);
+  22  __decorate([
+
+  25      __metadata("design:type", String)
+  26: ], Game.prototype, "name", void 0);
+  27  __decorate([
+
+  30      __metadata("design:type", String)
+  31: ], Game.prototype, "description", void 0);
+  32  __decorate([
+
+  35      __metadata("design:type", String)
+  36: ], Game.prototype, "image", void 0);
+  37: Game = __decorate([
+  38      (0, type_graphql_1.ObjectType)()
+  39: ], Game);
+  40: exports.Game = Game;
+  41: exports.GameModel = (0, typegoose_1.getModelForClass)(Game, { schemaOptions: { timestamps: true } });
+
+build\entities\user-entity.js:
+  15  const mongodb_1 = require("mongodb");
+  16: const game_entity_1 = require("./game-entity");
+  17  const user_roles_1 = require("../resolvers/user/user-roles");
+
+  49  __decorate([
+  50:     (0, type_graphql_1.Field)(type => [game_entity_1.Game]),
+  51      (0, typegoose_1.prop)({ default: [] }),
+  52      __metadata("design:type", Array)
+  53: ], User.prototype, "games", void 0);
+  54  __decorate([
+
+build\resolvers\game\game-arguments.js:
+  11  Object.defineProperty(exports, "__esModule", { value: true });
+  12: exports.GameInput = exports.BaseGameInput = void 0;
+  13  const type_graphql_1 = require("type-graphql");
+  14  const mongodb_1 = require("mongodb");
+  15: let BaseGameInput = class BaseGameInput {
+  16  };
+
+  19      __metadata("design:type", String)
+  20: ], BaseGameInput.prototype, "name", void 0);
+  21  __decorate([
+
+  23      __metadata("design:type", String)
+  24: ], BaseGameInput.prototype, "description", void 0);
+  25  __decorate([
+
+  27      __metadata("design:type", String)
+  28: ], BaseGameInput.prototype, "image", void 0);
+  29: BaseGameInput = __decorate([
+  30      (0, type_graphql_1.InputType)()
+  31: ], BaseGameInput);
+  32: exports.BaseGameInput = BaseGameInput;
+  33: let GameInput = class GameInput extends BaseGameInput {
+  34  };
+
+  37      __metadata("design:type", mongodb_1.ObjectId)
+  38: ], GameInput.prototype, "_id", void 0);
+  39: GameInput = __decorate([
+  40      (0, type_graphql_1.InputType)()
+  41: ], GameInput);
+  42: exports.GameInput = GameInput;
+
+build\resolvers\game\game-resolver.js:
+  14  Object.defineProperty(exports, "__esModule", { value: true });
+  15: exports.GameResolver = void 0;
+  16  const type_graphql_1 = require("type-graphql");
+  17: const game_entity_1 = require("../../entities/game-entity");
+  18: const game_arguments_1 = require("./game-arguments");
+  19: let GameResolver = class GameResolver {
+  20:     async games() {
+  21:         return await game_entity_1.GameModel.find({});
+  22      }
+  23:     async game(_id) {
+  24:         return await game_entity_1.GameModel.findById(_id);
+  25      }
+  26:     async createGame(data) {
+  27:         const newUser = new game_entity_1.GameModel(data);
+  28          await newUser.save();
+
+  31      // @Authorized([UserRoles.ADMIN, UserRoles.SUPER_ADMIN])
+  32:     async deleteGame(_id) {
+  33:         return await game_entity_1.GameModel.findByIdAndRemove(_id);
+  34      }
+  35:     async editGame(_id, data) {
+  36:         return await game_entity_1.GameModel.findByIdAndUpdate(_id, data, { new: true });
+  37      }
+
+  39  __decorate([
+  40:     (0, type_graphql_1.Query)(returns => [game_entity_1.Game]),
+  41      __metadata("design:type", Function),
+
+  43      __metadata("design:returntype", Promise)
+  44: ], GameResolver.prototype, "games", null);
+  45  __decorate([
+  46:     (0, type_graphql_1.Query)(returns => game_entity_1.Game),
+  47      __param(0, (0, type_graphql_1.Arg)("_id")),
+
+  50      __metadata("design:returntype", Promise)
+  51: ], GameResolver.prototype, "game", null);
+  52  __decorate([
+  53:     (0, type_graphql_1.Mutation)(returns => game_entity_1.Game),
+  54      __param(0, (0, type_graphql_1.Arg)("data")),
+  55      __metadata("design:type", Function),
+  56:     __metadata("design:paramtypes", [game_arguments_1.BaseGameInput]),
+  57      __metadata("design:returntype", Promise)
+  58: ], GameResolver.prototype, "createGame", null);
+  59  __decorate([
+  60:     (0, type_graphql_1.Mutation)(returns => game_entity_1.Game),
+  61      __param(0, (0, type_graphql_1.Arg)("_id")),
+
+  64      __metadata("design:returntype", Promise)
+  65: ], GameResolver.prototype, "deleteGame", null);
+  66  __decorate([
+  67:     (0, type_graphql_1.Mutation)(returns => game_entity_1.Game),
+  68      __param(0, (0, type_graphql_1.Arg)("_id")),
+
+  70      __metadata("design:type", Function),
+  71:     __metadata("design:paramtypes", [String, game_arguments_1.GameInput]),
+  72      __metadata("design:returntype", Promise)
+  73: ], GameResolver.prototype, "editGame", null);
+  74: GameResolver = __decorate([
+  75      (0, type_graphql_1.Resolver)()
+  76: ], GameResolver);
+  77: exports.GameResolver = GameResolver;
+
+build\resolvers\user\user-arguments.js:
+  14  const type_graphql_1 = require("type-graphql");
+  15: const game_arguments_1 = require("../game/game-arguments");
+  16  let CreateUserInput = class CreateUserInput {
+
+  64  __decorate([
+  65:     (0, type_graphql_1.Field)(type => [game_arguments_1.GameInput]),
+  66      __metadata("design:type", Array)
+  67: ], EditUserInput.prototype, "games", void 0);
+  68  EditUserInput = __decorate([
+
+src\schema.gql:
+   5  
+   6: input BaseGameInput {
+   7    description: String!
+
+  21    firstName: String
+  22:   games: [GameInput!]!
+  23    lastName: String
+
+  26  
+  27: type Game {
+  28    _id: ObjectId!
+
+  33  
+  34: input GameInput {
+  35    _id: ObjectId!
+
+  41  type Mutation {
+  42:   createGame(data: BaseGameInput!): Game!
+  43    createUser(data: CreateUserInput!): User!
+  44:   deleteGame(_id: String!): Game!
+  45    deleteUser(_id: String!): User!
+  46:   editGame(_id: String!, data: GameInput!): Game!
+  47    editUser(_id: String!, data: EditUserInput!): User!
+
+  55    currentUser: User!
+  56:   game(_id: String!): Game!
+  57:   games: [Game!]!
+  58    user(_id: String!): User!
+
+  65    firstName: String!
+  66:   games: [Game!]!
+  67    lastLogin: Float!
+
+src\schema.ts:
+   3  import { AuthResolver } from "./resolvers/auth/auth-resolver";
+   4: import { GameResolver } from "./resolvers/game/game-resolver";
+   5  import { TypegooseMiddleware } from "./typegoose-middleware";
+
+  16              AuthResolver,
+  17:             GameResolver,
+  18          ],
+
+src\entities\game-entity.ts:
+   5  @ObjectType()
+   6: export class Game {
+   7  
+
+  23  
+  24: export const GameModel = getModelForClass(Game, { schemaOptions: { timestamps: true }})
+
+src\entities\user-entity.ts:
+   3  import { ObjectId } from "mongodb"
+   4: import { Game } from "./game-entity";
+   5  import { UserRoles } from "../resolvers/user/user-roles";
+
+  34  
+  35:   @Field(type => [Game])
+  36    @Prop({default: []})
+  37:   games?: Game[]
+  38  
+
+src\resolvers\game\game-arguments.ts:
+   4  @InputType()
+   5: export class BaseGameInput {
+   6    @Field()
+
+  16  @InputType()
+  17: export class GameInput extends BaseGameInput {
+  18    @Field()
+
+src\resolvers\game\game-resolver.ts:
+   1  import { Resolver, Query, Mutation, Arg, Authorized } from "type-graphql";
+   2: import { Game, GameModel } from "../../entities/game-entity";
+   3  import { UserRoles } from "../user/user-roles";
+   4: import { BaseGameInput, GameInput } from "./game-arguments";
+   5  
+   6  @Resolver()
+   7: export class GameResolver {
+   8  
+   9:   @Query(returns => [Game])
+  10:   async games():Promise<Game[]> {
+  11:     return await GameModel.find({})
+  12    }
+  13  
+  14:   @Query(returns => Game)
+  15:   async game(@Arg("_id") _id: string):Promise<Game> {
+  16:     return await GameModel.findById(_id);
+  17    }
+  18  
+  19:   @Mutation(returns => Game)
+  20:   async createGame(@Arg("data") data: BaseGameInput):Promise<Game> {
+  21:     const newUser = new GameModel(data);
+  22      await newUser.save();
+
+  26    // @Authorized([UserRoles.ADMIN, UserRoles.SUPER_ADMIN])
+  27:   @Mutation(returns => Game)
+  28:   async deleteGame(@Arg("_id") _id: string):Promise<Game> {
+  29:     return await GameModel.findByIdAndRemove(_id);
+  30    }
+  31  
+  32:   @Mutation(returns => Game)
+  33:   async editGame(@Arg("_id") _id: string, @Arg("data") data: GameInput):Promise<Game> {
+  34:     return await GameModel.findByIdAndUpdate(_id, data, {new: true});
+  35    }
+
+src\resolvers\user\user-arguments.ts:
+   2  import { Field, InputType } from "type-graphql";
+   3: import { GameInput } from "../game/game-arguments";
+   4  @InputType()
+
+  41    
+  42:   @Field(type => [GameInput])
+  43:   games?: GameInput[]
+  44  }
